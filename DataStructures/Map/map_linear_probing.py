@@ -31,7 +31,6 @@ def size(my_map):
     return my_map["size"]
 
 def is_available(entry):
-
     if entry["key"] is None:
         return True
     return False
@@ -82,6 +81,37 @@ def put(my_map, key, value):
         table[pos]["value"] = value
 
         my_map["size"] += 1
+        my_map["current_factor"] = my_map["size"] / my_map["capacity"]
+
+    return my_map
+
+def contains(my_map, key):
+
+    hash_pos = mf.hash_value(my_map, key)
+    found, pos = find_slot(my_map, key, hash_pos)
+
+    return found
+
+def get(my_map, key):
+
+    hash_pos = mf.hash_value(my_map, key)
+    found, pos = find_slot(my_map, key, hash_pos)
+
+    if found:
+        return my_map["table"]["elements"][pos]["value"]
+
+    return None
+
+def remove(my_map, key):
+
+    hash_pos = mf.hash_value(my_map, key)
+    found, pos = find_slot(my_map, key, hash_pos)
+
+    if found:
+        my_map["table"]["elements"][pos]["key"] = None
+        my_map["table"]["elements"][pos]["value"] = None
+
+        my_map["size"] -= 1
         my_map["current_factor"] = my_map["size"] / my_map["capacity"]
 
     return my_map
