@@ -1,10 +1,11 @@
-import random
 from DataStructures.List import array_list as al
 from DataStructures.List import single_linked_list as sll
 from DataStructures.Map import map_entry as me
 from DataStructures.Map import map_functions as mf
 
+
 def new_map(num_elements, load_factor, prime=109345121):
+
     capacity = int(num_elements / load_factor)
     if capacity < 1:
         capacity = 1
@@ -17,8 +18,8 @@ def new_map(num_elements, load_factor, prime=109345121):
     my_map = {
         "prime": prime,
         "capacity": capacity,
-        "scale": 1,   # IMPORTANTE: fijo para tests
-        "shift": 0,   # IMPORTANTE: fijo para tests
+        "scale": 1,   # fijo para tests
+        "shift": 0,   # fijo para tests
         "table": table,
         "current_factor": 0,
         "limit_factor": load_factor,
@@ -28,13 +29,14 @@ def new_map(num_elements, load_factor, prime=109345121):
     return my_map
 
 
+
 def put(my_map, key, value):
+
     index = mf.hash_value(my_map, key)
     bucket = al.get_element(my_map["table"], index)
 
     node = bucket["first"]
 
-    # Buscar si ya existe
     while node is not None:
         entry = node["info"]
         if me.get_key(entry) == key:
@@ -42,13 +44,13 @@ def put(my_map, key, value):
             return my_map
         node = node["next"]
 
-    # Si no existe → agregar
     new_entry = me.new_map_entry(key, value)
     sll.add_last(bucket, new_entry)
 
     my_map["size"] += 1
     my_map["current_factor"] = my_map["size"] / my_map["capacity"]
 
+  
     if my_map["current_factor"] > my_map["limit_factor"]:
         new_map_obj = rehash(my_map)
         my_map.clear()
@@ -56,9 +58,8 @@ def put(my_map, key, value):
 
     return my_map
 
-    return my_map
-
 def get(my_map, key):
+
     index = mf.hash_value(my_map, key)
     bucket = al.get_element(my_map["table"], index)
 
@@ -72,7 +73,14 @@ def get(my_map, key):
 
     return None
 
+
+
+def contains(my_map, key):
+    return get(my_map, key) is not None
+
+
 def remove(my_map, key):
+
     index = mf.hash_value(my_map, key)
     bucket = al.get_element(my_map["table"], index)
 
@@ -94,7 +102,6 @@ def remove(my_map, key):
 
             bucket["size"] -= 1
             my_map["size"] -= 1
-
             my_map["current_factor"] = my_map["size"] / my_map["capacity"]
 
             return my_map
@@ -104,16 +111,21 @@ def remove(my_map, key):
 
     return my_map
 
+
+
 def size(my_map):
     return my_map["size"]
+
+
 
 def is_empty(my_map):
     return my_map["size"] == 0
 
 
-def key_set(my_map):
-    keys = al.new_list()
 
+def key_set(my_map):
+
+    keys = al.new_list()
     table = my_map["table"]
 
     for i in range(al.size(table)):
@@ -122,14 +134,16 @@ def key_set(my_map):
 
         while node is not None:
             entry = node["info"]
-            al.add_last(keys, entry["key"])
+            al.add_last(keys, me.get_key(entry))
             node = node["next"]
 
     return keys
 
-def value_set(my_map):
-    values = al.new_list()
 
+
+def value_set(my_map):
+
+    values = al.new_list()
     table = my_map["table"]
 
     for i in range(al.size(table)):
@@ -138,33 +152,28 @@ def value_set(my_map):
 
         while node is not None:
             entry = node["info"]
-            al.add_last(values, entry["value"])
+            al.add_last(values, me.get_value(entry))
             node = node["next"]
 
     return values
 
+
 def rehash(my_map):
+
     old_table = my_map["table"]
     old_capacity = my_map["capacity"]
 
-    # nueva capacidad (el doble)
     new_capacity = old_capacity * 2
 
-    # crear nuevo map
     new_map_obj = new_map(new_capacity, my_map["limit_factor"], my_map["prime"])
 
-    # reiniciar valores importantes
-    new_map_obj["size"] = 0
-    new_map_obj["current_factor"] = 0
-
-    # reinsertar todo
     for i in range(al.size(old_table)):
         bucket = al.get_element(old_table, i)
         node = bucket["first"]
 
         while node is not None:
             entry = node["info"]
-            put(new_map_obj, entry["key"], entry["value"])
+            put(new_map_obj, me.get_key(entry), me.get_value(entry))
             node = node["next"]
 
     return new_map_obj
