@@ -49,6 +49,13 @@ def put(my_map, key, value):
     my_map["size"] += 1
     my_map["current_factor"] = my_map["size"] / my_map["capacity"]
 
+    if my_map["current_factor"] > my_map["limit_factor"]:
+        new_map_obj = rehash(my_map)
+        my_map.clear()
+        my_map.update(new_map_obj)
+
+    return my_map
+
     return my_map
 
 def get(my_map, key):
