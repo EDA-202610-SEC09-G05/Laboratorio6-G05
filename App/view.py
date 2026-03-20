@@ -25,10 +25,7 @@
  """
 
 import sys
-import App.logic as logic
-# TODO Realice la importación del mapa linear probing
-# TODO Realice la importación de ArrayList como estructura de datos auxiliar para sus requerimientos
-import sys
+import tracemalloc
 from App import logic
 from DataStructures.List import array_list as al
 
@@ -52,10 +49,22 @@ def new_logic():
 # TODO Incluir las mediciones de tiempo y uso de memoria en la ejecución de la consulta.
 def load_data(control):
     """
-    Solicita a la controlador que cargue los datos
+    Solicita al controlador que cargue los datos
+    incluyendo medición de tiempo y memoria
     """
+    start_time = logic.getTime()
+    tracemalloc.start()
+    start_memory = logic.getMemory()
+
     books, authors, tags, book_tags = logic.load_data(control)
-    return books, authors, tags, book_tags
+
+    stop_memory = logic.getMemory()
+    end_time = logic.getTime()
+
+    tiempo = logic.deltaTime(end_time, start_time)
+    memoria = logic.deltaMemory(start_memory, stop_memory)
+
+    return books, authors, tags, book_tags, tiempo, memoria
 
 #  -------------------------------------------------------------
 # Funciones para la correcta impresión de los datos
@@ -153,12 +162,14 @@ def main():
         # TODO agregar tiempo de ejecución y consumo de memoria
         if int(inputs[0]) == 1:
             print("Cargando información de los archivos ....")
-            bk, at, tg, bktg = load_data(control)
+            bk, at, tg, bktg, tiempo, memoria = load_data(control)
             print('Libros cargados: ' + str(bk))
             print('Autores cargados: ' + str(at))
             print('Géneros cargados: ' + str(tg))
             print('Asociación de Géneros a Libros cargados: ' +
                   str(bktg))
+            print(f"\nTiempo: {tiempo:.2f} ms")
+            print(f"Memoria: {memoria:.2f} kB\n")
 
         elif int(inputs[0]) == 2:
             number = input("Ingrese el id del libro (good_read_book_id) que desea buscar: ")
@@ -167,8 +178,8 @@ def main():
 
         elif int(inputs[0]) == 3:
             authorname = input("Nombre del autor a buscar: ")
-            author, author_book_list = logic.get_books_by_author(control, authorname)
-            print_books_by_author(author,author_book_list)
+            author_book_list = logic.get_books_by_author(control, authorname)
+            print_books_by_author(authorname, author_book_list)
 
         elif int(inputs[0]) == 4:
             label = input("Etiqueta a buscar: ")
