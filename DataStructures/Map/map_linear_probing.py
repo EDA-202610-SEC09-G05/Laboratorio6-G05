@@ -30,7 +30,10 @@ def new_map(num_elements, load_factor, prime=109345121):
 def size(my_map):
     return my_map["size"]
 
-def is_available(entry):
+def is_available(table, index):
+
+    entry = table["elements"][index]
+
     if entry["key"] is None:
         return True
     return False
@@ -43,7 +46,8 @@ def default_compare(key, entry):
 
 def find_slot(my_map, key, hash_value):
 
-    table = my_map["table"]["elements"]
+    table = my_map["table"]
+    elements = table["elements"]
     capacity = my_map["capacity"]
 
     first_available = None
@@ -51,20 +55,17 @@ def find_slot(my_map, key, hash_value):
 
     while True:
 
-        entry = table[index]
-
-        if is_available(entry):
+        if is_available(table, index):
             if first_available is None:
                 first_available = index
 
-            if entry["key"] is None:
+            if elements[index]["key"] is None:
                 return False, first_available
 
-        elif default_compare(key, entry):
+        elif default_compare(key, elements[index]):
             return True, index
 
         index = (index + 1) % capacity
-
 
 def put(my_map, key, value):
 
